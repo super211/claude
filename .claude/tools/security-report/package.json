@@ -1,0 +1,13 @@
+{
+  "name": "security-report",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Builds the security-scanner agent's Word (.docx) report from a findings JSON file.",
+  "main": "build-report.js",
+  "scripts": {
+    "build": "node build-report.js"
+  },
+  "dependencies": {
+    "docx": "9.8.1"
+  }
+}

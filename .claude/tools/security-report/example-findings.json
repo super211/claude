@@ -1,0 +1,87 @@
+{
+  "project": "IT PMO Kanban (EXAMPLE DATA — schema reference only)",
+  "target": "https://super211.github.io/claude/",
+  "repo": "https://github.com/super211/claude",
+  "commit": "0000000",
+  "date": "2026-01-01",
+  "scanner": "security-scanner agent (Claude Code)",
+  "overallRisk": "Medium",
+  "summary": "This example shows the findings schema the security-scanner agent writes before building the Word report. Every field below is illustrative.\n\nReplace this paragraph with two or three short paragraphs for a non-technical reader: what was assessed, the overall risk, and the most important fixes.",
+  "scope": [
+    "index.html (client-side application: HTML, CSS, JavaScript)",
+    "Live deployment at the GitHub Pages URL (HTTP response headers, TLS)",
+    "Repository configuration: GitHub Actions workflow, .gitignore, Claude Code tooling (.mcp.json, hooks, skills)"
+  ],
+  "methodology": [
+    "Manual source review of every DOM sink and data flow (STRIDE threat model)",
+    "Automated pattern search for secrets, dangerous APIs and unsafe configuration",
+    "Live checks of HTTP response headers and the Content-Security-Policy hash"
+  ],
+  "findings": [
+    {
+      "id": "SEC-001",
+      "title": "Missing clickjacking protection (frame-ancestors / X-Frame-Options)",
+      "severity": "Medium",
+      "cvss": { "score": 4.3, "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N" },
+      "owasp": "A05:2021 – Security Misconfiguration",
+      "cwe": "CWE-1021",
+      "category": "Deployment / headers",
+      "location": "https://super211.github.io/claude/ (response headers)",
+      "description": "The page can be embedded in a frame on any origin because neither a CSP frame-ancestors directive nor an X-Frame-Options header is sent.",
+      "evidence": "$ curl -sI https://super211.github.io/claude/ | grep -i -E 'x-frame|frame-ancestors'\n(no output)",
+      "impact": "An attacker page could overlay the board and trick a user into clicking Delete or Move.",
+      "recommendation": "Serve the site from a host that can set response headers, or add a frame-busting check as a fallback.",
+      "fix": "// Fallback in the script's INIT section:\nif (window.top !== window.self) { document.body.hidden = true; }",
+      "effort": "Low",
+      "priority": "Short term",
+      "status": "Open",
+      "references": ["https://owasp.org/www-community/attacks/Clickjacking"]
+    },
+    {
+      "id": "SEC-002",
+      "title": "Third-party GitHub Actions pinned by tag, not commit SHA",
+      "severity": "Low",
+      "cvss": { "score": 3.1, "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N" },
+      "owasp": "A08:2021 – Software and Data Integrity Failures",
+      "cwe": "CWE-829",
+      "category": "Supply chain",
+      "location": ".github/workflows/pages.yml:25",
+      "description": "Actions are referenced by mutable major-version tags.",
+      "evidence": "uses: actions/checkout@v7",
+      "impact": "A compromised tag could run attacker code in the deploy job.",
+      "recommendation": "Pin each action to a full commit SHA with the version in a comment.",
+      "fix": "uses: actions/checkout@<40-char-sha> # v7.0.1",
+      "effort": "Low",
+      "priority": "Long term",
+      "status": "Open"
+    },
+    {
+      "id": "SEC-003",
+      "title": "Example informational note",
+      "severity": "Informational",
+      "cvss": { "score": 0.0, "vector": "n/a" },
+      "owasp": "n/a",
+      "cwe": "n/a",
+      "category": "Best practice",
+      "location": "index.html",
+      "description": "Informational findings record hardening ideas that are not vulnerabilities.",
+      "recommendation": "Consider it during the next refactor.",
+      "effort": "Low",
+      "priority": "Long term",
+      "status": "Open"
+    }
+  ],
+  "roadmap": {
+    "immediate": [],
+    "shortTerm": ["SEC-001: add clickjacking protection"],
+    "longTerm": ["SEC-002: pin GitHub Actions to commit SHAs", "SEC-003: hardening backlog"]
+  },
+  "positives": [
+    "Hash-pinned Content-Security-Policy blocks inline and injected scripts",
+    "All user input is sanitised on entry and escaped on output"
+  ],
+  "limitations": [
+    "Static site with no backend; server-side controls were out of scope",
+    "No authenticated or dynamic penetration testing was performed"
+  ]
+}

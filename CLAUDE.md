@@ -13,7 +13,7 @@ Board data is held **in memory only**: a page refresh resets it to the seed task
 `index.html` is split into banner-commented sections (`/* ==== SECTION ==== */`), in order:
 - **CSS**: design tokens on `:root` (orange `--brand-*` scale, `--st-*` status colours + `-bg` column tints, `--p-*` priority, health colours, `--sp-*` spacing, radii, shadows), then base, header, panels, analytics, delivery, filters, board/columns, cards, modal/form, toasts, responsive (columns stack below 768px; 44px targets on coarse pointers), reduced-motion.
 - **HTML**: header with summary strip, **Board Analytics** panel, **Delivery Board** panel, filter bar, four static `<section class="column" data-status="...">` columns, Add Task modal (with honeypot field), toast region, chart tooltip.
-- **JS** (`'use strict'`, no framework, no modules): CONFIG → STATE → HELPERS → SANITISATION → SEED DATA → FILTERING → ANALYTICS → RENDERING → ACTIONS → TOASTS → TOOLTIP → PANEL TOGGLES → BOARD EVENTS → DRAG & DROP → FILTER EVENTS → MODAL → FORM → NETWORK → INIT.
+- **JS** (`'use strict'`, no framework, no modules): CONFIG → STATE → HELPERS → SANITISATION → SEED DATA → FILTERING → ANALYTICS → RENDERING → ACTIONS → TOASTS → TOOLTIP → HOOKS → CHATBOT WIDGET → PANEL TOGGLES → BOARD EVENTS → DRAG & DROP → FILTER EVENTS → MODAL → FORM → NETWORK → INIT.
 
 Keep new code in the matching section and follow the existing style (CSS custom properties for colors/spacing, `escapeHtml()` on every interpolated value in template strings).
 
@@ -64,3 +64,15 @@ To republish elsewhere, run the project command `/publish-github <repo url>` (`.
 ## Claude Code hooks
 
 `.claude/settings.json` registers a `Stop` hook. Each time Claude finishes a response, it runs `.claude/hooks/task-done-popup.ps1` (Windows PowerShell 5.1), which shows a "Task complete" congratulations dialog. The dialog runs in a detached, hidden-start PowerShell process, so the hook returns immediately. The script shows and hides an invisible owner form first, because Windows applies the hidden-start flag to a process's first window. Without that step, the dialog itself would stay invisible. To turn the hook off, remove the `Stop` entry or use `/hooks`.
+
+## Security scanner agent
+
+`.claude/agents/security-scanner.md` is a project subagent. Ask Claude for a "security scan" or "security report" to run it. It audits `index.html`, the live Pages deployment, CI and the Claude Code tooling, classifies findings (severity from CVSS v3.1, OWASP Top 10 2021, CWE), recommends fixes, and writes `security-reports/security-report-<date>.docx`. The agent never edits code.
+
+The report is built by `.claude/tools/security-report/build-report.js` (npm `docx`, pinned; input schema in `example-findings.json`). `verify-report.ps1` checks the report by opening it in Microsoft Word, exporting a PDF and rendering PNG pages. The PDF export takes about a minute. On a timeout, the script stops only the hidden Word instance it started. `security-reports/` is git-ignored because reports describe vulnerabilities in a public repo.
+
+## WhatsApp chat widget and page hooks
+
+A floating WhatsApp button (`#chat-fab`, bottom right) opens a suggested-queries dialog (`#chat-panel`). `WHATSAPP_NUMBER` in CONFIG (digits only, country code first; currently `6512345678`, i.e. +65 1234 5678) is the single place the number lives. Choosing a question or submitting the text box calls `openWhatsApp()`. It builds `https://wa.me/<number>?text=…` from `sanitizeText()` output, prefixed with `[IT PMO] `, and opens it with `noopener,noreferrer`. Nothing is sent until the user presses send in WhatsApp.
+
+The page has a tiny hook registry (HOOKS section): `addHook(name, fn)` and `runHooks(name, ctx)`. Handlers are wrapped in try/catch. The chat button fires `chatbot:open`, and `init()` registers `renderChatSuggestions` on it to rebuild the dialog from `buildSuggestedQueries()`: overdue and blocked tasks, an Off track workstream, the next task due within 7 days, and general PMO questions. `chatbot:query` and `chatbot:close` also fire, so add features by registering hooks rather than editing the click handlers. Toasts sit above the button. Remember to recompute the CSP hash after editing the script.

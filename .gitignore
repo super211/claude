@@ -21,3 +21,9 @@ _site/
 
 # Playwright MCP page snapshots and scratch output
 .playwright-mcp/
+
+# Security scanner output (contains vulnerability details; keep out of the public repo)
+security-reports/
+
+# Security report builder dependencies
+.claude/tools/security-report/node_modules/
