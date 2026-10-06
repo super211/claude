@@ -68,6 +68,7 @@ The repo includes project-level [Claude Code](https://claude.com/claude-code) to
 - **`/publish-github` command** (`.claude/commands/publish-github.md`): scans for secrets, pushes, deploys GitHub Pages, refreshes this README and its screenshot, and sets the repo About panel.
 - **Playwright MCP** (`.mcp.json`): lets Claude drive a real browser for testing and screenshots.
 - **Skills** (`.claude/skills/`): `cybersecurity-analyst`, `ui-ux-pro-max`, and the Agent Kanban skills `ak-task`, `ak-plan`, `ak-worker` and `ak-maintainer`. Sources are listed in `skills-lock.json`. The `ak-*` skills need the external Realmroot Toolbox, and the `ui-ux-pro-max` search scripts need Python 3.
+- **Task-complete popup hook** (`.claude/settings.json` → `.claude/hooks/task-done-popup.ps1`): a `Stop` hook that shows a "Task complete" congratulations dialog each time Claude finishes a response. It's Windows-only, using Windows PowerShell 5.1. Disable it via `/hooks` or by removing the `Stop` entry; on macOS or Linux, remove it to avoid hook errors.
 
 ## Limitations
 
