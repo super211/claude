@@ -51,6 +51,14 @@ New cards appear on the board straight away, and the email is sent in the backgr
 
 `.github/workflows/pages.yml` deploys the site to GitHub Pages on every push to `main`, and can also be run manually. It copies only `index.html` into the published site, so repo files such as `CLAUDE.md` are not served. In the repository settings, the Pages source is **GitHub Actions**.
 
+## Development tooling (Claude Code)
+
+The repo includes project-level [Claude Code](https://claude.com/claude-code) tooling. None of it is part of the deployed site.
+
+- **`/publish-github` command** (`.claude/commands/publish-github.md`): scans for secrets, pushes, deploys GitHub Pages, refreshes this README and its screenshot, and sets the repo About panel.
+- **Playwright MCP** (`.mcp.json`): lets Claude drive a real browser for testing and screenshots.
+- **Skills** (`.claude/skills/`): `cybersecurity-analyst`, `ui-ux-pro-max`, and the Agent Kanban skills `ak-task`, `ak-plan`, `ak-worker` and `ak-maintainer`. Sources are listed in `skills-lock.json`. The `ak-*` skills need the external Realmroot Toolbox, and the `ui-ux-pro-max` search scripts need Python 3.
+
 ## Limitations
 
 - **No persistence.** Board data lives in memory only, so refreshing the page resets it to the demo tasks. The UI says so in a note under the header.
