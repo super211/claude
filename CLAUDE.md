@@ -36,4 +36,4 @@ On Add Task, the card is added optimistically first, then `notifyNewTask()` POST
 
 ## Deployment (GitHub Pages)
 
-`.github/workflows/pages.yml` deploys on every push to `main`: it copies only `index.html` and `404.html` into `_site/` and publishes it to https://super211.github.io/claude/ (Pages source = "GitHub Actions"). Any new site file must be added to the workflow's copy step. `404.html` links back with the absolute path `/claude/` because it is served at arbitrary depths. Both pages use an inline data-URI favicon so browsers don't request a missing `/favicon.ico`.
+`.github/workflows/pages.yml` deploys on every push to `main`: it copies only `index.html` into `_site/` and publishes it to https://super211.github.io/claude/ (Pages source = "GitHub Actions"). Any new site file must be added to the workflow's copy step. Unknown paths get GitHub's default 404 page. `index.html` uses an inline data-URI favicon so browsers don't request a missing `/favicon.ico`.

@@ -28,7 +28,7 @@ jobs:
       - name: Stage site
         run: |
           mkdir _site
-          cp index.html 404.html _site/
+          cp index.html _site/
           touch _site/.nojekyll
 
       - name: Configure Pages
