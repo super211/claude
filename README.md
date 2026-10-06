@@ -8,8 +8,18 @@ A single-file Kanban board for a fictitious bank's internal IT Project Managemen
 
 ## Features
 
-- **Four-column board**: Backlog, In Progress, Blocked and Done, side by side on desktop and stacked below 768px. Each column shows a live task count.
-- **Task cards** with ID (`ITPM-0001`), title, project/workstream, assignee, priority pill, due date, category tag and an **Overdue** badge. The left border is colour-coded by priority (Critical red, High amber, Medium blue, Low grey).
+- **Board Analytics**: KPI tiles (total, completion %, overdue, blocked, due in 7 days, work-in-progress against its limit) and charts for the status mix, open tasks by priority, and workload by assignee. Charts have hover tooltips and an accessible table view.
+- **Delivery Board**: one row per workstream, with a progress bar split by status, done/open/overdue counts, next due date, and a health badge (On track / At risk / Off track).
+- **Orange theme with a colour per column**: Backlog violet, In Progress cyan, Blocked red and Done green. These colours passed the dataviz skill's colour-blind and contrast checks, and every column also has a name and an icon, so colour is never the only cue.
+- **Four-column board**: Backlog, In Progress, Blocked and Done, side by side on desktop and stacked below 768px. Each column shows a live task count. In Progress (limit 4) and Blocked (limit 3) have work-in-progress limits, with a warning when a limit is exceeded.
+- **Task cards** with ID (`ITPM-0001`), title, project/workstream, assignee initials, priority pill, due date with a countdown ("Due in 5d", "2d overdue"), category tag and an **Overdue** badge. Cards are sorted by priority, then due date. The left border is colour-coded by priority (Critical red, High amber, Medium blue, Low grey).
+- **Security hardening**:
+  - a Content-Security-Policy that allows only the page's own script, pinned by hash;
+  - input sanitising (strips control and invisible characters, blocks email-header injection) and allowlist validation;
+  - escaping of all output;
+  - a honeypot field plus a limit of 3 email notifications per minute;
+  - cookie-free, no-redirect notification requests;
+  - drag-and-drop that only accepts the board's own cards.
 - **Drag and drop** between columns using the native HTML5 API, with a highlight on the column you're hovering over.
 - **Keyboard-accessible move**: a **Move ▸** button on each card opens a menu of target columns. Esc closes it.
 - **Inline delete confirmation** ("Delete? Yes / No") instead of a browser dialog.
