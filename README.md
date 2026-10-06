@@ -4,7 +4,7 @@ A single-file Kanban board for a fictitious bank's internal IT Project Managemen
 
 **Live demo:** https://super211.github.io/claude/
 
-![IT PMO Kanban board showing the four columns with demo tasks](docs/screenshot.png)
+![IT PMO board in the orange theme: Board Analytics tiles and charts, the Delivery Board health table, the filter bar, and the four colour-tinted Kanban columns with demo tasks](docs/screenshot.png)
 
 ## Features
 
