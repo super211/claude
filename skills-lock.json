@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "ak-maintainer": {
+      "source": "saltbo/agent-kanban",
+      "sourceType": "github",
+      "skillPath": "skills/ak-maintainer/SKILL.md",
+      "computedHash": "0e98e3711f271e20a4d59c2d13b2376594fbfe57e8a3fda37ce4065f8d18d5df"
+    },
+    "ak-plan": {
+      "source": "saltbo/agent-kanban",
+      "sourceType": "github",
+      "skillPath": "skills/ak-plan/SKILL.md",
+      "computedHash": "f885caa7acf528c48d27067f429c850381cfba1be5ceb909040636c855870f0e"
+    },
+    "ak-task": {
+      "source": "saltbo/agent-kanban",
+      "sourceType": "github",
+      "skillPath": "skills/ak-task/SKILL.md",
+      "computedHash": "42a88fa23741ec7099ac2f1d24efc1d89363b4e244d7c68bcd4c0c687065175a"
+    },
+    "ak-worker": {
+      "source": "saltbo/agent-kanban",
+      "sourceType": "github",
+      "skillPath": "skills/ak-worker/SKILL.md",
+      "computedHash": "8162a59a19806a403689904bd4591bc207befd49d3030a2481d02c2223953235"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "7ac62d931e52dbc7c309ed8ee067101969db2454709339b02daa583e80e98d5f"
+    }
+  }
+}
