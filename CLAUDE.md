@@ -33,3 +33,7 @@ On Add Task, the card is added optimistically first, then `notifyNewTask()` POST
 
 - `FORMSUBMIT_ENDPOINT` at the top of the script is the **only** place the recipient email lives. It ships as the placeholder `YOUR_EMAIL@example.com`, which deliberately throws, so the warning toast is expected until it's configured.
 - FormSubmit needs a one-time activation: the first submission to a new address sends a confirmation email, and nothing is delivered until that link is clicked. It can return HTTP 200 with `success: "false"`, which the code treats as a failure.
+
+## Deployment (GitHub Pages)
+
+`.github/workflows/pages.yml` deploys on every push to `main`: it copies only `index.html` and `404.html` into `_site/` and publishes it to https://super211.github.io/claude/ (Pages source = "GitHub Actions"). Any new site file must be added to the workflow's copy step. `404.html` links back with the absolute path `/claude/` because it is served at arbitrary depths. Both pages use an inline data-URI favicon so browsers don't request a missing `/favicon.ico`.
