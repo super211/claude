@@ -60,3 +60,7 @@ To republish elsewhere, run the project command `/publish-github <repo url>` (`.
 ## Browser testing (Playwright MCP)
 
 `.mcp.json` registers the Playwright MCP server at project scope (`cmd /c npx -y @playwright/mcp@latest`; the `cmd /c` wrapper is required on Windows). Use it to open `index.html` or the live Pages URL and exercise drag-and-drop, the Move menu, filters and the Add Task form in a real browser. It uses the installed Chrome by default.
+
+## Claude Code hooks
+
+`.claude/settings.json` registers a `Stop` hook. Each time Claude finishes a response, it runs `.claude/hooks/task-done-popup.ps1` (Windows PowerShell 5.1), which shows a "Task complete" congratulations dialog. The dialog runs in a detached, hidden-start PowerShell process, so the hook returns immediately. The script shows and hides an invisible owner form first, because Windows applies the hidden-start flag to a process's first window. Without that step, the dialog itself would stay invisible. To turn the hook off, remove the `Stop` entry or use `/hooks`.
