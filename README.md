@@ -4,7 +4,7 @@ A single-file Kanban board for a fictitious bank's internal IT Project Managemen
 
 **Live demo:** https://super211.github.io/claude/
 
-![IT PMO board in the orange theme: Board Analytics tiles and charts, the Delivery Board health table, the filter bar, and the four colour-tinted Kanban columns with demo tasks](docs/screenshot.png)
+![IT PMO board in the orange theme: Board Analytics tiles and charts, the Delivery Board health table, the filter bar, and the four colour-tinted Kanban columns with demo tasks, and the floating WhatsApp chat button](docs/screenshot.png)
 
 ## Features
 
@@ -69,6 +69,7 @@ The repo includes project-level [Claude Code](https://claude.com/claude-code) to
 - **`/publish-github` command** (`.claude/commands/publish-github.md`): scans for secrets, pushes, deploys GitHub Pages, refreshes this README and its screenshot, and sets the repo About panel.
 - **Playwright MCP** (`.mcp.json`): lets Claude drive a real browser for testing and screenshots.
 - **Skills** (`.claude/skills/`): `cybersecurity-analyst`, `ui-ux-pro-max`, and the Agent Kanban skills `ak-task`, `ak-plan`, `ak-worker` and `ak-maintainer`. Sources are listed in `skills-lock.json`. The `ak-*` skills need the external Realmroot Toolbox, and the `ui-ux-pro-max` search scripts need Python 3.
+- **Security scanner agent** (`.claude/agents/security-scanner.md`): ask Claude for a security scan. It audits the app, the live deployment, CI and the tooling; classifies each finding by severity (CVSS v3.1), OWASP Top 10 and CWE; recommends fixes; and writes `security-reports/security-report-<date>.docx` using `.claude/tools/security-report/`. Reports are git-ignored, and Word is used to verify them.
 - **Task-complete popup hook** (`.claude/settings.json` → `.claude/hooks/task-done-popup.ps1`): a `Stop` hook that shows a "Task complete" congratulations dialog each time Claude finishes a response. It's Windows-only, using Windows PowerShell 5.1. Disable it via `/hooks` or by removing the `Stop` entry; on macOS or Linux, remove it to avoid hook errors.
 
 ## Limitations
