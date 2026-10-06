@@ -39,3 +39,7 @@ On Add Task, the card is added optimistically first, then `notifyNewTask()` POST
 `.github/workflows/pages.yml` deploys on every push to `main`: it copies only `index.html` into `_site/` and publishes it to https://super211.github.io/claude/ (Pages source = "GitHub Actions"). Any new site file must be added to the workflow's copy step. Unknown paths get GitHub's default 404 page. `index.html` uses an inline data-URI favicon so browsers don't request a missing `/favicon.ico`.
 
 To republish elsewhere, run the project command `/publish-github <repo url>` (`.claude/commands/publish-github.md`): it scans for secrets, pushes, sets up the Pages workflow, and writes the README and repo About.
+
+## Browser testing (Playwright MCP)
+
+`.mcp.json` registers the Playwright MCP server at project scope (`cmd /c npx -y @playwright/mcp@latest`; the `cmd /c` wrapper is required on Windows). Use it to open `index.html` or the live Pages URL and exercise drag-and-drop, the Move menu, filters and the Add Task form in a real browser. It uses the installed Chrome by default.

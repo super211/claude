@@ -23,7 +23,7 @@ Then classify every hit:
 - **Placeholders and public-by-design values** (e.g. `YOUR_EMAIL@example.com`, `noreply@anthropic.com` co-author lines) → fine. List them so the user can see them.
 - **Real secrets or personal data** → **STOP**. Show file:line with the value masked (first 4 chars + `…`) and propose a fix: move it to an env var or an untracked config file, add the file to `.gitignore`, and rotate the secret if it is already in history. Do not push until the user confirms.
 
-Create or update `.gitignore` with sensible entries for the stack (always include `.env`, `*.log`, OS/editor junk such as `.DS_Store`, `Thumbs.db`, `.vscode/` unless already committed intentionally, and `.claude/settings.local.json`).
+Create or update `.gitignore` with sensible entries for the stack (always include `.env`, `*.log`, OS/editor junk such as `.DS_Store`, `Thumbs.db`, `.vscode/` unless already committed intentionally, `.claude/settings.local.json`, and `.playwright-mcp/`).
 
 ## 2. Upload the code to GitHub
 
@@ -56,9 +56,15 @@ Create or update `.gitignore` with sensible entries for the stack (always includ
 
 ## 4. Create or edit the README
 
-Create or update `README.md` from what the code actually does (read it, don't guess):
+First, **capture a screenshot of the live site** with the Playwright MCP tools (`.mcp.json` registers the `playwright` server; if its tools aren't available, say so and skip the image rather than inventing one):
+1. `browser_resize` to 1440×900, then `browser_navigate` to the verified Pages URL.
+2. `browser_take_screenshot` with `fullPage: true`, `scale: "css"`, `filename: "docs/screenshot.png"`. Overwrite the existing file so it stays current.
+3. Read the image back and check it shows the real page (not an error, a 404 or a blank load), then `browser_close`.
+4. Make sure `.playwright-mcp/` (Playwright's snapshot output) is in `.gitignore`. Commit only `docs/screenshot.png`.
+
+Then create or update `README.md` from what the code actually does (read it, don't guess):
 - the title and a one-paragraph summary;
-- a **Live demo** link to the Pages URL;
+- a **Live demo** link to the Pages URL, followed by the screenshot: `![<descriptive alt text>](docs/screenshot.png)`;
 - features; how to run locally; configuration (e.g. placeholder constants the user must change, without real values); tech stack / constraints; how deployment works (the Pages workflow); and limitations (e.g. no persistence).
 - Keep any existing hand-written README sections and only update facts that changed. Don't invent badges, licences or contributors. Mention a licence only if a LICENSE file exists.
 

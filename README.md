@@ -4,6 +4,8 @@ A single-file Kanban board for a fictitious bank's internal IT Project Managemen
 
 **Live demo:** https://super211.github.io/claude/
 
+![IT PMO Kanban board showing the four columns with demo tasks](docs/screenshot.png)
+
 ## Features
 
 - **Four-column board**: Backlog, In Progress, Blocked and Done, side by side on desktop and stacked below 768px. Each column shows a live task count.
