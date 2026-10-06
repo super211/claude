@@ -10,7 +10,7 @@
   - connect-src limits network calls to FormSubmit; everything else is 'none'.
   - frame-ancestors cannot be set from a <meta> tag; GitHub Pages can't send headers.
 -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Pn5a/2iVmqbTPWdaxQIfzgLC06I9JeF1wNvK9+rbMMk='; style-src 'unsafe-inline'; img-src data:; connect-src https://formsubmit.co; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-DujWRNzqhp6CpU7NlHalq0c5rGf5aKp9P4PGDY4WRe8='; style-src 'unsafe-inline'; img-src data:; connect-src https://formsubmit.co; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IT PMO Kanban</title>
@@ -76,6 +76,13 @@
   --danger-bg: #fee2e2;
 
   --focus: #1d4ed8;
+
+  /* WhatsApp chat widget. White text passes contrast on teal and dark, not on the bright green. */
+  --wa-green:  #25d366;
+  --wa-teal:   #128c7e;
+  --wa-dark:   #075e54;
+  --wa-bubble: #dcf8c6;
+  --wa-chat-bg: #efeae2;
 
   --sp-1: 4px;
   --sp-2: 8px;
@@ -829,7 +836,7 @@ textarea { resize: vertical; min-height: 84px; }
 .toast-region {
   position: fixed;
   right: var(--sp-4);
-  bottom: var(--sp-4);
+  bottom: calc(var(--sp-5) + 76px); /* sits above the WhatsApp button */
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
@@ -864,6 +871,150 @@ textarea { resize: vertical; min-height: 84px; }
 }
 
 /* =========================================================
+   WHATSAPP CHAT WIDGET — floating button + suggested-queries dialog
+   ========================================================= */
+.chat-fab {
+  position: fixed;
+  right: var(--sp-5);
+  bottom: var(--sp-5);
+  z-index: 90;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: var(--wa-teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.15s, background-color 0.15s;
+}
+.chat-fab:hover { background: var(--wa-dark); transform: scale(1.06); }
+.chat-fab[aria-expanded="true"] { background: var(--wa-dark); }
+.chat-fab svg { width: 32px; height: 32px; }
+.chat-fab:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+.chat-panel {
+  position: fixed;
+  right: var(--sp-5);
+  bottom: calc(var(--sp-5) + 72px);
+  z-index: 95;
+  width: min(380px, calc(100vw - 32px));
+  max-height: min(580px, calc(100vh - 120px));
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: chat-in 0.18s ease-out;
+}
+.chat-panel[hidden] { display: none; }
+
+.chat-head {
+  background: var(--wa-dark);
+  color: #fff;
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--wa-teal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.chat-avatar svg { width: 24px; height: 24px; }
+.chat-head h2 { font-size: 16px; line-height: 1.2; }
+.chat-head p { font-size: 12px; color: #d1fae5; }
+.chat-close {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+}
+.chat-close:hover { background: rgba(255, 255, 255, 0.15); }
+.chat-close:focus-visible { outline-color: #fff; }
+
+.chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  background: var(--wa-chat-bg);
+}
+.chat-bubble {
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) var(--radius);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: 14px;
+  box-shadow: var(--shadow-sm);
+  max-width: 92%;
+  margin-bottom: var(--sp-2);
+}
+.chat-group-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--ink-soft);
+  margin: var(--sp-3) 0 var(--sp-2);
+}
+.chat-suggestions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.chat-suggestion {
+  width: 100%;
+  min-height: 40px;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  background: var(--surface);
+  border: 1px solid #b7e4c7;
+  border-radius: var(--radius);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: 14px;
+  color: var(--ink);
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.chat-suggestion:hover { background: var(--wa-bubble); border-color: var(--wa-teal); }
+.chat-suggestion .q-icon { color: var(--wa-teal); font-weight: 700; flex-shrink: 0; }
+
+.chat-form {
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.chat-form input { flex: 1; min-width: 0; }
+.chat-send {
+  min-height: 40px;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0 var(--sp-4);
+  background: var(--wa-teal);
+  color: #fff;
+  font-weight: 600;
+}
+.chat-send:hover { background: var(--wa-dark); }
+.chat-note { font-size: 12px; color: var(--ink-mute); padding: 0 var(--sp-3) var(--sp-3); background: var(--surface); }
+
+@keyframes chat-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* =========================================================
    RESPONSIVE — stack columns below 768px; bigger touch targets
    ========================================================= */
 @media (max-width: 767px) {
@@ -876,6 +1027,8 @@ textarea { resize: vertical; min-height: 84px; }
   .form-grid { grid-template-columns: 1fr; }
   .btn-header { width: 100%; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
+  .chat-fab { right: var(--sp-4); bottom: var(--sp-4); }
+  .chat-panel { right: var(--sp-4); bottom: calc(var(--sp-4) + 72px); }
 }
 
 @media (pointer: coarse) {
@@ -883,7 +1036,8 @@ textarea { resize: vertical; min-height: 84px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast, .column, .card, .btn, .panel-toggle .chev { animation: none; transition: none; }
+  .toast, .column, .card, .btn, .panel-toggle .chev, .chat-fab, .chat-panel, .chat-suggestion { animation: none; transition: none; }
+  .chat-fab:hover { transform: none; }
   .card:hover { transform: none; }
 }
 </style>
@@ -1147,6 +1301,39 @@ textarea { resize: vertical; min-height: 84px; }
 <div class="toast-region" id="toasts" aria-live="polite" role="status"></div>
 <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
 
+<!-- =========================================================
+     WHATSAPP CHAT WIDGET — floating button + suggested-queries dialog.
+     Clicking the button fires the "chatbot:open" hook (see HOOKS in the
+     script), whose handler fills the dialog with questions built from the
+     current board. Choosing one opens WhatsApp (wa.me) with it pre-filled.
+     ========================================================= -->
+<button type="button" class="chat-fab" id="chat-fab" aria-haspopup="dialog" aria-expanded="false" aria-controls="chat-panel" aria-label="Chat with the IT PMO on WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <path d="M16 3.2C8.9 3.2 3.2 8.8 3.2 15.7c0 2.4.7 4.7 2 6.7L3.6 28.6l6.4-1.6c1.8 1 3.9 1.5 6 1.5 7.1 0 12.8-5.6 12.8-12.6S23.1 3.2 16 3.2z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M11.7 9.5c-.3-.6-.6-.6-.9-.6h-.8c-.3 0-.7.1-1.1.5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.7 4.2 6.6 5.7 3.3 1.3 3.9 1 4.6.9.7-.1 2.3-.9 2.6-1.8.3-.9.3-1.7.2-1.8-.1-.2-.4-.3-.7-.5l-2.4-1.1c-.3-.1-.6-.2-.8.2-.2.4-.9 1.1-1.1 1.3-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3.1-1.9-1.1-1-1.9-2.3-2.1-2.7-.2-.4 0-.6.2-.8l.6-.7c.2-.2.3-.4.4-.7.1-.3 0-.5 0-.7l-1-2.4z" fill="currentColor"/>
+  </svg>
+</button>
+
+<section class="chat-panel" id="chat-panel" role="dialog" aria-modal="false" aria-labelledby="chat-title" aria-describedby="chat-note" hidden>
+  <div class="chat-head">
+    <span class="chat-avatar" aria-hidden="true">
+      <svg viewBox="0 0 32 32" focusable="false"><path d="M16 3.2C8.9 3.2 3.2 8.8 3.2 15.7c0 2.4.7 4.7 2 6.7L3.6 28.6l6.4-1.6c1.8 1 3.9 1.5 6 1.5 7.1 0 12.8-5.6 12.8-12.6S23.1 3.2 16 3.2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg>
+    </span>
+    <div>
+      <h2 id="chat-title">IT PMO Assistant</h2>
+      <p>Replies on WhatsApp · <span id="chat-number"></span></p>
+    </div>
+    <button type="button" class="chat-close" id="chat-close" aria-label="Close chat">&times;</button>
+  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <form class="chat-form" id="chat-form" novalidate autocomplete="off">
+    <label for="chat-input" class="visually-hidden">Type your own question</label>
+    <input type="text" id="chat-input" maxlength="300" placeholder="Type your own question…">
+    <button type="submit" class="chat-send">Send</button>
+  </form>
+  <p class="chat-note" id="chat-note">Opens WhatsApp with your question pre-filled. Nothing is sent until you press send in WhatsApp.</p>
+</section>
+
 <!--
   FORMSUBMIT CONFIGURATION
   FORMSUBMIT_ENDPOINT (top of the script below) is the only place the
@@ -1169,6 +1356,11 @@ const NOTIFY_RATE_LIMIT = Object.freeze({ max: 3, windowMs: 60000 });
 const ID_PREFIX = "ITPM-";
 const ID_PATTERN = /^ITPM-\d{4,}$/;
 const DND_MIME = "application/x-itpm-task"; // only our own cards can be dropped
+
+// WhatsApp chat widget: international number, digits only, country code first (65 = Singapore).
+const WHATSAPP_NUMBER = "6512345678";
+const WHATSAPP_PREFIX = "[IT PMO] ";
+const CHAT_MAX_LENGTH = 300;
 
 const STATUSES = Object.freeze(["Backlog", "In Progress", "Blocked", "Done"]);
 const PROJECTS = Object.freeze([
@@ -1207,6 +1399,7 @@ const state = {
   openMoveId: null,      // card currently showing its Move menu
   inFlight: 0,           // FormSubmit requests in progress
   notifyLog: [],         // timestamps of recent notifications (rate limit)
+  chatOpen: false,       // WhatsApp chat dialog visible
 };
 
 /* =========================================================
@@ -1748,6 +1941,156 @@ function hideTooltip() {
 }
 
 /* =========================================================
+   HOOKS — minimal event-hook registry. Features register handlers
+   with addHook(name, fn); UI code fires them with runHooks(name, ctx).
+   A failing handler is logged and never breaks the board.
+   Hooks used: "chatbot:open", "chatbot:close", "chatbot:query".
+   ========================================================= */
+const hookRegistry = new Map();
+
+function addHook(name, fn) {
+  if (!hookRegistry.has(name)) hookRegistry.set(name, []);
+  hookRegistry.get(name).push(fn);
+}
+
+function runHooks(name, context = {}) {
+  (hookRegistry.get(name) || []).forEach((fn) => {
+    try {
+      fn(context);
+    } catch (err) {
+      console.error(`[IT PMO] hook "${name}" failed:`, err);
+    }
+  });
+}
+
+/* =========================================================
+   CHATBOT WIDGET — floating WhatsApp button + suggested-queries dialog
+   ========================================================= */
+const chatFab = document.getElementById("chat-fab");
+const chatPanel = document.getElementById("chat-panel");
+const chatInput = document.getElementById("chat-input");
+
+// "6512345678" → "+65 1234 5678"
+function formatPhone(number) {
+  const sg = /^65(\d{4})(\d{4})$/.exec(number);
+  return sg ? `+65 ${sg[1]} ${sg[2]}` : `+${number}`;
+}
+
+function whatsappUrl(text) {
+  if (!/^\d{8,15}$/.test(WHATSAPP_NUMBER)) {
+    throw new Error("WHATSAPP_NUMBER must be 8–15 digits, country code first");
+  }
+  const message = sanitizeText(WHATSAPP_PREFIX + text, WHATSAPP_PREFIX.length + CHAT_MAX_LENGTH);
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+function openWhatsApp(text) {
+  runHooks("chatbot:query", { text });
+  // noopener/noreferrer: WhatsApp gets no handle on this page and no referrer.
+  window.open(whatsappUrl(text), "_blank", "noopener,noreferrer");
+  showToast("Opening WhatsApp with your question…", "info");
+}
+
+// Suggested questions: some built from the live board, plus general PMO queries.
+function buildSuggestedQueries() {
+  const open = state.tasks.filter((t) => t.status !== "Done").sort(compareTasks);
+  const seen = new Set();
+  const board = [];
+  const add = (task, text) => {
+    if (task && seen.has(task.id)) return;
+    if (task) seen.add(task.id);
+    board.push(text);
+  };
+
+  open.filter(isOverdue).slice(0, 2).forEach((t) =>
+    add(t, `What's the latest on ${t.id} "${t.title}"? It's ${-daysUntil(t.dueDate)}d overdue.`));
+  open.filter((t) => t.status === "Blocked").slice(0, 2).forEach((t) =>
+    add(t, `What's blocking ${t.id} "${t.title}", and can we escalate?`));
+  PROJECTS.map(computeDelivery).filter((d) => d.health === "off").slice(0, 1).forEach((d) =>
+    add(null, `What's the recovery plan for ${d.project}? It's showing Off track.`));
+  open.filter((t) => !isOverdue(t) && daysUntil(t.dueDate) <= 7).slice(0, 1).forEach((t) =>
+    add(t, `Is ${t.id} "${t.title}" on track for ${formatDate(t.dueDate)}?`));
+
+  return {
+    board: board.slice(0, 5),
+    general: [
+      "What's the overall status of the IT project portfolio this week?",
+      "Which IT projects need steering committee attention?",
+      "How do I raise a new IT project or change request?",
+      "Who do I contact about a vendor or contract issue?",
+    ],
+  };
+}
+
+// Registered on "chatbot:open": (re)builds the dialog body from current state.
+function renderChatSuggestions() {
+  const { board, general } = buildSuggestedQueries();
+  const group = (label, items) => (items.length
+    ? `<p class="chat-group-label">${escapeHtml(label)}</p>
+       <ul class="chat-suggestions">${items.map((q) => `
+         <li><button type="button" class="chat-suggestion" data-query="${escapeHtml(q)}">
+           <span class="q-icon" aria-hidden="true">?</span><span>${escapeHtml(q)}</span>
+         </button></li>`).join("")}
+       </ul>`
+    : "");
+  document.getElementById("chat-body").innerHTML =
+    `<div class="chat-bubble">Hi! \u{1F44B} I'm the IT PMO assistant. Pick a question about your IT projects, or type your own. It opens WhatsApp with the message ready to send.</div>` +
+    group("About this board", board) +
+    group("General", general);
+}
+
+function openChat() {
+  if (state.chatOpen) return;
+  state.chatOpen = true;
+  runHooks("chatbot:open", { tasks: state.tasks });
+  chatPanel.hidden = false;
+  chatFab.setAttribute("aria-expanded", "true");
+  const first = chatPanel.querySelector(".chat-suggestion");
+  (first || chatInput).focus();
+}
+
+function closeChat(restoreFocus = true) {
+  if (!state.chatOpen) return;
+  state.chatOpen = false;
+  chatPanel.hidden = true;
+  chatFab.setAttribute("aria-expanded", "false");
+  runHooks("chatbot:close");
+  if (restoreFocus) chatFab.focus();
+}
+
+function handleChatClick(event) {
+  const suggestion = event.target.closest(".chat-suggestion");
+  if (suggestion) openWhatsApp(suggestion.dataset.query);
+}
+
+function handleChatSubmit(event) {
+  event.preventDefault();
+  const text = sanitizeText(chatInput.value, CHAT_MAX_LENGTH);
+  if (!text) {
+    chatInput.setAttribute("aria-invalid", "true");
+    chatInput.focus();
+    return;
+  }
+  chatInput.removeAttribute("aria-invalid");
+  openWhatsApp(text);
+  chatInput.value = "";
+}
+
+function handleChatKeydown(event) {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeChat();
+  }
+}
+
+// Clicking anywhere outside the dialog (and not on the button) closes it.
+function handleOutsideChatClick(event) {
+  if (state.chatOpen && !chatPanel.contains(event.target) && !chatFab.contains(event.target)) {
+    closeChat(false);
+  }
+}
+
+/* =========================================================
    PANEL TOGGLES — collapse Board Analytics / Delivery Board
    ========================================================= */
 function handlePanelToggle(event) {
@@ -2159,6 +2502,17 @@ function init() {
   modalEl.addEventListener("keydown", handleModalKeydown);
   formEl.addEventListener("submit", handleSubmit);
   formEl.addEventListener("input", updateCharCounts);
+
+  // WhatsApp chat widget: the click fires the "chatbot:open" hook, whose
+  // registered handler builds the suggested IT-project questions.
+  addHook("chatbot:open", renderChatSuggestions);
+  document.getElementById("chat-number").textContent = formatPhone(WHATSAPP_NUMBER);
+  chatFab.addEventListener("click", () => (state.chatOpen ? closeChat() : openChat()));
+  document.getElementById("chat-close").addEventListener("click", () => closeChat());
+  chatPanel.addEventListener("click", handleChatClick);
+  chatPanel.addEventListener("keydown", handleChatKeydown);
+  document.getElementById("chat-form").addEventListener("submit", handleChatSubmit);
+  document.addEventListener("click", handleOutsideChatClick);
 
   resetForm();
   seedTasks();
